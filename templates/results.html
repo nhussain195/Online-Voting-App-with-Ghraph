@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voting Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .summary {
+            margin-top: 30px;
+        }
+
+        .summary ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .summary li {
+            background: #e9f1f7;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Voting Results</h2>
+
+        <canvas id="voteChart" width="400" height="300"></canvas>
+
+        <div class="summary">
+            <h3>Vote Summary:</h3>
+            <ul>
+                {% set total = data|map(attribute=1)|sum %}
+                {% for option, count in data %}
+                    <li><strong>{{ option }}</strong>: {{ count }} votes ({{ (count / total * 100)|round(2) }}%)</li>
+                {% endfor %}
+            </ul>
+             <div style="margin-bottom: 20px; font-size: 20px; font-weight: bold;">
+             ✅ Total Votes Cast: {{ total_votes }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('voteChart').getContext('2d');
+
+        const data = {
+            labels: {{ data | map(attribute=0) | list | tojson }},
+            datasets: [{
+                label: 'Votes',
+                data: {{ data | map(attribute=1) | list | tojson }},
+                backgroundColor: ['#213917', 'rgb(0,0,0)', '#ff0000', '#17a2b8'],
+                borderColor: ['#0056b3', '#1e7e34', '#d39e00', '#117a8b'],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+</body>
+</html>
