@@ -3,18 +3,16 @@ import sqlite3
 
 app = Flask(__name__)
 
-# ---------------------
+
 # Get client IP address
-# ---------------------
 def get_ip():
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         return request.remote_addr
     else:
         return request.environ['HTTP_X_FORWARDED_FOR']
 
-# ------------------------
+
 # Initialize or reset DB
-# ------------------------
 conn = sqlite3.connect('votes.db')
 cur = conn.cursor()
 
@@ -33,22 +31,19 @@ CREATE TABLE votes (
 conn.commit()
 conn.close()
 
-# ----------------------
+
 # Reusable DB connection
-# ----------------------
 def get_db():
     return sqlite3.connect('votes.db')
 
-# ----------------------
+
 # Index page
-# ----------------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# ----------------------
+
 # Vote submission route
-# ----------------------
 @app.route('/vote', methods=['POST'])
 def vote():
     option = request.form['option']
@@ -70,9 +65,8 @@ def vote():
 
     return redirect('/results')
 
-# ----------------------
 # Results route
-# ----------------------
+
 @app.route('/results')
 def results():
     conn = get_db()
@@ -95,8 +89,7 @@ def results():
 
     return render_template('results.html', data=result, total_votes=total_votes)
 
-# ----------------------
+
 # Run the app
-# ----------------------
 if __name__ == '__main__':
     app.run(debug=True)
